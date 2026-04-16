@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fórmulas de Cálculo en Reportes – Material de Estudio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --negro: #0d0d0d;
+    --rojo: #c0001a;
+    --rojo-bg: #fff0f2;
+    --blanco: #ffffff;
+    --gris-claro: #f5f5f5;
+    --gris-medio: #e0e0e0;
+    --gris-texto: #4a4a4a;
+    --verde: #006b3c;
+    --verde-bg: #edf7f2;
+    --sombra: 0 4px 24px rgba(0,0,0,0.08);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--negro);
+    color: var(--negro);
+    min-height: 100vh;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--negro);
+    color: var(--blanco);
+    padding: 60px 20px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(192,0,26,0.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner { max-width: 1100px; margin: 0 auto; position: relative; }
+  .hero-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--rojo);
+    border: 1px solid var(--rojo);
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 22px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 900;
+    line-height: 1.08;
+    margin-bottom: 18px;
+  }
+  .hero h1 span { color: var(--rojo); }
+  .hero-sub {
+    font-size: 1.05rem;
+    color: #aaa;
+    font-weight: 300;
+    max-width: 620px;
+    line-height: 1.6;
+  }
+  .hero-meta {
+    margin-top: 32px;
+    display: flex; gap: 28px; flex-wrap: wrap;
+  }
+  .meta-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: #777;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .meta-pill svg { color: var(--rojo); }
+
+  /* ── WRAPPER ── */
+  .main-wrap {
+    background: #f7f7f7;
+    border-radius: 20px 20px 0 0;
+    margin-top: -18px;
+    position: relative;
+    z-index: 2;
+    padding: 0 0 60px;
+  }
+
+  /* ── INDICACIONES ── */
+  .indicaciones {
+    background: var(--negro);
+    border-radius: 20px 20px 0 0;
+    padding: 36px 20px 30px;
+    position: relative;
+    overflow: hidden;
+  }
+  .indicaciones::after {
+    content: '📋';
+    position: absolute;
+    right: 24px; top: 20px;
+    font-size: 5rem;
+    opacity: 0.06;
+  }
+  .ind-inner { max-width: 1100px; margin: 0 auto; }
+  .section-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rojo);
+    margin-bottom: 14px;
+  }
+  .indicaciones h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: var(--blanco);
+    margin-bottom: 16px;
+  }
+  .ind-lista {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .ind-lista li {
+    font-size: 0.92rem;
+    color: #ccc;
+    line-height: 1.55;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .ind-lista li .ind-n {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--rojo);
+    font-weight: 700;
+    flex-shrink: 0;
+    min-width: 22px;
+  }
+  .ind-nota {
+    background: rgba(192,0,26,0.12);
+    border-left: 3px solid var(--rojo);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    font-size: 0.88rem;
+    color: #ddd;
+    line-height: 1.6;
+  }
+  .ind-nota strong { color: var(--rojo); }
+
+  /* ── TEORÍA ── */
+  .teoria-wrap { max-width: 1100px; margin: 0 auto; padding: 40px 20px 0; }
+  .teoria-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--negro);
+    margin-bottom: 36px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .teoria-titulo::before {
+    content: '';
+    display: block; width: 6px; height: 36px;
+    background: var(--rojo); border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .modulo {
+    background: var(--blanco);
+    border-radius: 16px;
+    box-shadow: var(--sombra);
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .modulo-header {
+    background: var(--negro);
+    padding: 20px 28px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .modulo-num {
+    background: var(--rojo);
+    color: var(--blanco);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .modulo-header h3 {
+    font-family: 'Playfair Display', serif;
+    color: var(--blanco);
+    font-size: 1.2rem;
+  }
+  .modulo-header .func-badge {
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--rojo);
+    background: rgba(192,0,26,0.15);
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(192,0,26,0.3);
+    white-space: nowrap;
+  }
+  .modulo-body { padding: 28px; }
+
+  .def-box {
+    background: var(--rojo-bg);
+    border-left: 4px solid var(--rojo);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 20px;
+    margin-bottom: 22px;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--gris-texto);
+  }
+  .def-box strong { color: var(--rojo); }
+
+  .subtitulo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: var(--negro);
+    margin: 22px 0 12px;
+    border-bottom: 2px solid var(--gris-medio);
+    padding-bottom: 6px;
+  }
+  p.texto { font-size: 0.95rem; line-height: 1.75; color: var(--gris-texto); margin-bottom: 14px; }
+
+  .lista-teoria {
+    list-style: none; padding: 0; margin-bottom: 18px;
+  }
+  .lista-teoria li {
+    font-size: 0.93rem; line-height: 1.6; color: var(--gris-texto);
+    padding: 8px 0 8px 24px; border-bottom: 1px solid var(--gris-medio);
+    position: relative;
+  }
+  .lista-teoria li::before { content: '▸'; color: var(--rojo); position: absolute; left: 0; }
+  .lista-teoria li:last-child { border-bottom: none; }
+  .lista-teoria li strong { color: var(--negro); }
+
+  /* ── SINTAXIS ── */
+  .sintaxis-box {
+    background: #1a1a2e;
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 16px 0;
+    font-family: 'DM Mono', monospace;
+  }
+  .sintaxis-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  .sintaxis-code {
+    font-size: 1.1rem;
+    color: var(--rojo);
+    font-weight: 500;
+  }
+  .sintaxis-code .arg { color: #a8dadc; }
+  .sintaxis-code .kw { color: #f1c40f; }
+
+  /* ── TABLA DE EJEMPLOS ── */
+  .tabla-ejemplo {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 0.88rem;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--sombra);
+  }
+  .tabla-ejemplo thead tr { background: var(--negro); }
+  .tabla-ejemplo th {
+    color: var(--blanco);
+    padding: 11px 14px;
+    text-align: left;
+    font-weight: 500;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+  }
+  .tabla-ejemplo td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--gris-medio);
+    color: var(--gris-texto);
+    vertical-align: middle;
+  }
+  .tabla-ejemplo tr:last-child td { border-bottom: none; }
+  .tabla-ejemplo tr:nth-child(even) td { background: var(--gris-claro); }
+  .tabla-ejemplo td.celda-ref {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: #555;
+  }
+  .tabla-ejemplo td.celda-formula {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--rojo);
+    font-weight: 600;
+  }
+  .tabla-ejemplo td.celda-resultado {
+    font-weight: 700;
+    color: var(--negro);
+  }
+  .tabla-ejemplo td.celda-num { text-align: right; font-weight: 500; }
+  .th-resultado { background: rgba(192,0,26,0.15) !important; color: var(--rojo) !important; }
+
+  /* ── HOJA SIMULADA ── */
+  .hoja-wrap {
+    background: var(--gris-claro);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 16px 0;
+    overflow-x: auto;
+  }
+  .hoja-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: #999;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .hoja {
+    border-collapse: collapse;
+    min-width: 420px;
+    font-size: 0.85rem;
+  }
+  .hoja th {
+    background: #2d2d2d;
+    color: #aaa;
+    padding: 6px 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 400;
+    text-align: center;
+    border: 1px solid #444;
+  }
+  .hoja td {
+    border: 1px solid #d0d0d0;
+    padding: 7px 12px;
+    background: var(--blanco);
+    min-width: 80px;
+    text-align: center;
+  }
+  .hoja td.col-label {
+    background: #f0f0f0;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: #888;
+    font-weight: 600;
+    text-align: center;
+    min-width: 36px;
+  }
+  .hoja td.header-row {
+    background: var(--negro);
+    color: var(--blanco);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-align: center;
+  }
+  .hoja td.formula-cell {
+    background: #fff8f0;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--rojo);
+    font-weight: 700;
+  }
+  .hoja td.resultado-cell {
+    background: #fff0f2;
+    font-weight: 700;
+    color: var(--rojo);
+  }
+  .hoja td.dato { color: #1a1a2e; font-weight: 500; }
+
+  /* ── INFO BOX ── */
+  .info-box {
+    background: #fff8e1;
+    border-left: 4px solid #f9a825;
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: #5d4037;
+  }
+  .tip-box {
+    background: var(--verde-bg);
+    border-left: 4px solid var(--verde);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: #1b4332;
+  }
+
+  /* ── TABLA RESUMEN FINAL ── */
+  .tabla-resumen {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--sombra);
+    margin-top: 8px;
+  }
+  .tabla-resumen thead tr { background: var(--negro); }
+  .tabla-resumen th {
+    color: var(--blanco); padding: 12px 16px;
+    text-align: left; font-weight: 500;
+    font-family: 'DM Mono', monospace; font-size: 0.75rem;
+  }
+  .tabla-resumen td {
+    padding: 11px 16px; border-bottom: 1px solid var(--gris-medio);
+    color: var(--gris-texto); vertical-align: middle;
+  }
+  .tabla-resumen tr:last-child td { border-bottom: none; }
+  .tabla-resumen tr:nth-child(even) td { background: var(--gris-claro); }
+  .tabla-resumen td:first-child {
+    font-family: 'DM Mono', monospace; font-size: 0.85rem;
+    font-weight: 700; color: var(--rojo);
+  }
+  .tabla-resumen td:nth-child(2) { font-weight: 600; color: var(--negro); }
+
+  /* ── BOTÓN INICIAR ── */
+  .btn-iniciar-wrap { text-align: center; padding: 44px 20px 50px; }
+  .btn-iniciar {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--rojo); color: var(--blanco);
+    border: none; cursor: pointer; border-radius: 12px;
+    padding: 18px 44px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; font-weight: 700;
+    transition: transform .2s, box-shadow .2s;
+    box-shadow: 0 8px 28px rgba(192,0,26,0.4);
+  }
+  .btn-iniciar:hover { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(192,0,26,0.5); }
+
+  /* ── OVERLAY PRUEBA ── */
+  #prueba-overlay {
+    display: none; position: fixed; inset: 0;
+    background: #f7f7f7; z-index: 100; overflow-y: auto;
+  }
+  #prueba-overlay.activo { display: block; animation: fadeIn .35s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+
+  .overlay-header {
+    background: var(--negro); padding: 18px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .overlay-header-left {
+    font-family: 'DM Mono', monospace; font-size: 0.72rem;
+    color: #aaa; letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .overlay-header-left strong { color: var(--rojo); font-size: 0.85rem; }
+  .overlay-progreso { display: flex; align-items: center; gap: 10px; }
+  .prog-barra { width: 120px; height: 6px; background: rgba(255,255,255,0.12); border-radius: 3px; overflow: hidden; }
+  .prog-fill { height: 100%; background: var(--rojo); border-radius: 3px; transition: width .4s ease; }
+  .prog-texto { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: #888; }
+
+  .overlay-body { max-width: 700px; margin: 0 auto; padding: 40px 20px 60px; }
+
+  .screen { display: none; }
+  .screen.activa { display: block; animation: fadeIn .3s ease; }
+
+  /* ── PRUEBA HEADER ── */
+  .prueba-header {
+    background: var(--negro); border-radius: 16px;
+    padding: 34px 36px; margin-bottom: 30px;
+    position: relative; overflow: hidden;
+  }
+  .prueba-header::before {
+    content: '✏️'; position: absolute; right: 30px; top: 24px;
+    font-size: 4rem; opacity: 0.08;
+  }
+  .prueba-header .section-eyebrow { margin-bottom: 10px; }
+  .prueba-header h2 { font-family: 'Playfair Display', serif; color: var(--blanco); font-size: 1.9rem; margin-bottom: 8px; }
+  .prueba-header p { color: #aaa; font-size: 0.9rem; }
+
+  /* ── DATOS FORM ── */
+  .datos-form {
+    background: var(--blanco); border-radius: 14px;
+    box-shadow: var(--sombra); padding: 28px; margin-bottom: 30px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+  }
+  @media(max-width:560px) { .datos-form { grid-template-columns: 1fr; } }
+  .form-group label {
+    display: block; font-size: 0.78rem; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--negro); margin-bottom: 7px;
+  }
+  .form-group input {
+    width: 100%; padding: 11px 14px;
+    border: 2px solid var(--gris-medio); border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+    color: var(--negro); transition: border-color .2s; outline: none;
+  }
+  .form-group input:focus { border-color: var(--rojo); }
+
+  /* ── PREGUNTA ONE-AT-A-TIME ── */
+  .pregunta-single {
+    background: var(--blanco); border-radius: 16px;
+    box-shadow: var(--sombra); padding: 30px 28px;
+    border-top: 5px solid var(--gris-medio); transition: border-color .25s;
+  }
+  .pregunta-single.correcta { border-top-color: var(--verde); }
+  .pregunta-single.incorrecta { border-top-color: var(--rojo); }
+  .pregunta-num {
+    font-family: 'DM Mono', monospace; font-size: 0.7rem;
+    color: var(--rojo); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .pregunta-texto { font-size: 0.98rem; font-weight: 500; color: var(--negro); line-height: 1.6; margin-bottom: 18px; }
+  .opciones { display: flex; flex-direction: column; gap: 10px; }
+  .opcion-label {
+    display: flex; align-items: center; gap: 12px; cursor: pointer;
+    padding: 12px 16px; border-radius: 10px; border: 2px solid var(--gris-medio);
+    transition: border-color .2s, background .2s; font-size: 0.92rem;
+    color: var(--gris-texto); user-select: none;
+  }
+  .opcion-label:hover { border-color: var(--negro); }
+  .opcion-label input[type=radio] { display: none; }
+  .radio-custom {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid var(--gris-medio); flex-shrink: 0;
+    transition: all .2s; position: relative;
+  }
+  .opcion-label input[type=radio]:checked + .radio-custom { border-color: var(--negro); background: var(--negro); }
+  .opcion-label input[type=radio]:checked + .radio-custom::after {
+    content: ''; position: absolute; top:50%; left:50%;
+    transform: translate(-50%,-50%); width:6px; height:6px;
+    background: var(--blanco); border-radius: 50%;
+  }
+  .opcion-label.correcta-op { border-color: var(--verde); background: var(--verde-bg); color: var(--verde); font-weight: 600; }
+  .opcion-label.incorrecta-op { border-color: var(--rojo); background: var(--rojo-bg); color: var(--rojo); }
+  .opcion-label.disabled { pointer-events: none; opacity: 0.55; }
+  .opcion-label.correcta-op.disabled { opacity: 1; }
+
+  .feedback {
+    display: none; margin-top: 14px; border-radius: 10px;
+    padding: 13px 16px; font-size: 0.88rem; line-height: 1.6;
+  }
+  .feedback.correcto { background: var(--verde-bg); border-left: 4px solid var(--verde); color: #1b5e20; display: block; animation: fadeIn .3s ease; }
+  .feedback.incorrecto { background: var(--rojo-bg); border-left: 4px solid var(--rojo); color: #7f0010; display: block; animation: fadeIn .3s ease; }
+  .feedback-icon { font-size: 1.1rem; margin-right: 6px; }
+
+  .btn-siguiente {
+    display: none; width: 100%; margin-top: 18px; padding: 15px 20px;
+    background: var(--negro); color: var(--blanco); border: none; cursor: pointer;
+    border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+    font-weight: 600; letter-spacing: 0.06em; transition: background .2s;
+  }
+  .btn-siguiente:hover { background: var(--rojo); }
+  .btn-siguiente.visible { display: block; animation: fadeIn .3s ease; }
+
+  /* ── RESULTADOS ── */
+  .resultados {
+    background: var(--negro); border-radius: 16px; padding: 36px;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .resultados::before {
+    content: ''; position: absolute; top:-60px; left:50%;
+    transform: translateX(-50%); width:300px; height:300px; border-radius:50%;
+    background: radial-gradient(circle, rgba(192,0,26,0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .res-nombre { font-family:'DM Mono',monospace; font-size:0.75rem; color:#777; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:6px; }
+  .res-score { font-family:'Playfair Display',serif; font-size:4.5rem; font-weight:900; color:var(--blanco); line-height:1; margin-bottom:6px; }
+  .res-score span { color:var(--rojo); font-size:2rem; }
+  .res-label { color:#aaa; font-size:0.9rem; margin-bottom:20px; }
+  .res-barra-wrap { background:rgba(255,255,255,0.1); border-radius:8px; height:10px; margin:0 auto 24px; max-width:340px; overflow:hidden; }
+  .res-barra-fill { height:100%; background:var(--rojo); border-radius:8px; transition:width 1.2s cubic-bezier(.4,0,.2,1); width:0%; }
+  .res-stats { display:flex; justify-content:center; gap:28px; flex-wrap:wrap; margin-bottom:28px; }
+  .res-stat { text-align:center; }
+  .res-stat-num { font-family:'Playfair Display',serif; font-size:2rem; color:var(--blanco); font-weight:700; }
+  .res-stat-label { font-size:0.78rem; color:#888; letter-spacing:0.1em; text-transform:uppercase; }
+
+  .btn-pdf {
+    display: inline-flex; align-items:center; gap:10px;
+    background: var(--rojo); color: var(--blanco); border:none; cursor:pointer;
+    border-radius:10px; padding:14px 28px; font-family:'DM Sans',sans-serif;
+    font-size:0.95rem; font-weight:600; letter-spacing:0.05em;
+    transition:transform .2s, box-shadow .2s;
+    box-shadow:0 6px 20px rgba(192,0,26,0.35);
+  }
+  .btn-pdf:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(192,0,26,0.45); }
+
+  .footer-nota { text-align:center; padding:30px 20px; font-family:'DM Mono',monospace; font-size:0.72rem; color:#999; letter-spacing:0.1em; }
+
+  @media(max-width:680px) {
+    .hero, .teoria-wrap { padding-left:12px; padding-right:12px; }
+    .indicaciones { padding:28px 12px 24px; }
+    .modulo-body { padding:16px; }
+    .pregunta-single { padding:16px; }
+    .resultados { padding:20px 14px; }
+    .hero h1 { font-size:2rem; }
+    .modulo-header .func-badge { display:none; }
+  }
+  ::-webkit-scrollbar { width:8px; }
+  ::-webkit-scrollbar-track { background:#1a1a1a; }
+  ::-webkit-scrollbar-thumb { background:var(--rojo); border-radius:4px; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Análisis y Diseño de Reportes · 3.° Secundaria</div>
+    <h1>Fórmulas de<br><span>Cálculo en Reportes</span></h1>
+    <p class="hero-sub">SUMA, PROMEDIO, CONTAR, MIN y MAX: las funciones esenciales para analizar y presentar datos en cualquier reporte empresarial.</p>
+    <div class="hero-meta">
+      <span class="meta-pill">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        Lectura ~20 min
+      </span>
+      <span class="meta-pill">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Prueba 15 ítems · Valor 3 pts
+      </span>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN WRAP -->
+<div class="main-wrap">
+
+  <!-- INDICACIONES -->
+  <section class="indicaciones">
+    <div class="ind-inner">
+      <div class="section-eyebrow">📌 Antes de comenzar</div>
+      <h2>Indicaciones para el estudiante</h2>
+      <ol class="ind-lista">
+        <li><span class="ind-n">01.</span> Lee con atención todo el contenido teórico y analiza cada ejemplo antes de intentar responder la prueba.</li>
+        <li><span class="ind-n">02.</span> Estudia la sintaxis de cada función y observa cómo se aplica en las tablas de ejemplo.</li>
+        <li><span class="ind-n">03.</span> Al iniciar la prueba, escribe tu nombre completo y la fecha antes de responder.</li>
+        <li><span class="ind-n">04.</span> Cada pregunta tiene tres opciones. Selecciona la que consideres correcta; recibirás retroalimentación inmediata.</li>
+        <li><span class="ind-n">05.</span> Al finalizar, descarga tu prueba en PDF con los resultados obtenidos.</li>
+      </ol>
+      <div class="ind-nota">
+        <strong>Nota:</strong> La prueba tiene un valor total de <strong>3 puntos</strong>. Una vez seleccionada una respuesta, <strong>no podrás cambiarla</strong>. Tómate el tiempo necesario para leer cada enunciado con cuidado.
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ TEORÍA ════════ -->
+  <div class="teoria-wrap">
+    <div class="teoria-titulo">Contenido Teórico</div>
+
+    <!-- MÓDULO 0: Introducción -->
+    <div class="modulo">
+      <div class="modulo-header">
+        <div class="modulo-num">0</div>
+        <h3>¿Qué son las fórmulas de cálculo en reportes?</h3>
+      </div>
+      <div class="modulo-body">
+        <div class="def-box">
+          Las <strong>fórmulas de cálculo</strong> son instrucciones matemáticas que se escriben en celdas de una hoja de cálculo (como Microsoft Excel o Google Sheets) para procesar datos automáticamente. En los reportes empresariales, permiten obtener totales, promedios, conteos y valores extremos de forma rápida y precisa.
+        </div>
+        <p class="texto">Toda fórmula en Excel comienza con el signo <strong>=</strong> seguido del nombre de la función y los argumentos entre paréntesis. Los argumentos pueden ser rangos de celdas (ej. <code style="background:#f0f0f0;padding:2px 6px;border-radius:4px;font-family:'DM Mono',monospace">B2:B10</code>), valores individuales o combinaciones.</p>
+        <h4 class="subtitulo">Las 5 funciones fundamentales</h4>
+        <table class="tabla-resumen">
+          <thead>
+            <tr>
+              <th>Función</th>
+              <th>¿Qué calcula?</th>
+              <th>Ejemplo básico</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>=SUMA()</td><td>Suma todos los valores del rango</td><td>=SUMA(B2:B10)</td></tr>
+            <tr><td>=PROMEDIO()</td><td>Calcula la media aritmética</td><td>=PROMEDIO(B2:B10)</td></tr>
+            <tr><td>=CONTAR()</td><td>Cuenta celdas con valores numéricos</td><td>=CONTAR(B2:B10)</td></tr>
+            <tr><td>=MIN()</td><td>Devuelve el valor más pequeño</td><td>=MIN(B2:B10)</td></tr>
+            <tr><td>=MAX()</td><td>Devuelve el valor más grande</td><td>=MAX(B2:B10)</td></tr>
+          </tbody>
+        </table>
+        <div class="info-box">
+          💡 <strong>Importante:</strong> Un <strong>rango</strong> es un conjunto de celdas contiguas. Se escribe con la celda inicial, dos puntos y la celda final: <code style="background:#fff8e1;padding:2px 6px;border-radius:4px;font-family:'DM Mono',monospace">B2:B10</code> incluye todas las celdas desde B2 hasta B10.
+        </div>
+      </div>
+    </div>
+
+    <!-- MÓDULO 1: SUMA -->
+    <div class="modulo">
+      <div class="modulo-header">
+        <div class="modulo-num">1</div>
+        <h3>Función SUMA</h3>
+        <span class="func-badge">=SUMA()</span>
+      </div>
+      <div class="modulo-body">
+        <div class="def-box">
+          La función <strong>SUMA</strong> añade todos los valores numéricos dentro de un rango de celdas. Es la función más utilizada en reportes para obtener totales de ventas, gastos, cantidades, etc.
+        </div>
+        <h4 class="subtitulo">Sintaxis</h4>
+        <div class="sintaxis-box">
+          <div class="sintaxis-label">Estructura de la fórmula</div>
+          <div class="sintaxis-code">=<span class="kw">SUMA</span>(<span class="arg">rango</span>)</div>
+        </div>
+        <ul class="lista-teoria">
+          <li><strong>rango:</strong> las celdas que se desean sumar, ej. B2:B8</li>
+          <li>También puede sumar valores individuales: =SUMA(B2, B5, B9)</li>
+          <li>O combinar rangos: =SUMA(B2:B5, D2:D5)</li>
+        </ul>
+
+        <h4 class="subtitulo">Ejemplo aplicado: Ventas mensuales de una empresa</h4>
+        <p class="texto">La empresa <em>TechPulse S.A.</em> registra sus ventas mensuales del primer semestre. Se usa =SUMA() para calcular el total de ventas del período.</p>
+        <div class="hoja-wrap">
+          <div class="hoja-label">📊 Hoja de cálculo – Ventas mensuales</div>
+          <table class="hoja">
+            <thead>
+              <tr>
+                <th></th><th>A</th><th>B</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="col-label">1</td><td class="header-row">Mes</td><td class="header-row">Ventas (RD$)</td></tr>
+              <tr><td class="col-label">2</td><td class="dato">Enero</td><td class="dato">85,000</td></tr>
+              <tr><td class="col-label">3</td><td class="dato">Febrero</td><td class="dato">92,500</td></tr>
+              <tr><td class="col-label">4</td><td class="dato">Marzo</td><td class="dato">78,000</td></tr>
+              <tr><td class="col-label">5</td><td class="dato">Abril</td><td class="dato">105,200</td></tr>
+              <tr><td class="col-label">6</td><td class="dato">Mayo</td><td class="dato">98,750</td></tr>
+              <tr><td class="col-label">7</td><td class="dato">Junio</td><td class="dato">112,300</td></tr>
+              <tr><td class="col-label">8</td><td class="header-row" style="text-align:right;font-size:0.78rem;padding-right:10px;">TOTAL VENTAS</td><td class="formula-cell">=SUMA(B2:B7)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <table class="tabla-ejemplo">
+          <thead>
+            <tr>
+              <th>Celda</th><th>Fórmula utilizada</th><th class="th-resultado">Resultado</th><th>Interpretación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="celda-ref">B8</td>
+              <td class="celda-formula">=SUMA(B2:B7)</td>
+              <td class="celda-resultado">571,750</td>
+              <td>Total de ventas del primer semestre</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="tip-box">
+          ✅ <strong>Uso en reportes:</strong> SUMA aparece en casi todos los reportes financieros para calcular totales de columnas: total de ingresos, total de gastos, total de unidades vendidas, etc.
+        </div>
+      </div>
+    </div>
+
+    <!-- MÓDULO 2: PROMEDIO -->
+    <div class="modulo">
+      <div class="modulo-header">
+        <div class="modulo-num">2</div>
+        <h3>Función PROMEDIO</h3>
+        <span class="func-badge">=PROMEDIO()</span>
+      </div>
+      <div class="modulo-body">
+        <div class="def-box">
+          La función <strong>PROMEDIO</strong> calcula la <em>media aritmética</em> de un conjunto de valores: suma todos los números y los divide entre la cantidad de valores. Es fundamental en reportes para mostrar rendimiento típico o tendencia central.
+        </div>
+        <h4 class="subtitulo">Sintaxis</h4>
+        <div class="sintaxis-box">
+          <div class="sintaxis-label">Estructura de la fórmula</div>
+          <div class="sintaxis-code">=<span class="kw">PROMEDIO</span>(<span class="arg">rango</span>)</div>
+        </div>
+        <ul class="lista-teoria">
+          <li><strong>Cálculo interno:</strong> suma todos los valores y divide entre la cantidad de celdas con números.</li>
+          <li>Las celdas vacías <strong>no se cuentan</strong> en el denominador.</li>
+          <li>Las celdas con texto <strong>no se incluyen</strong> en el cálculo.</li>
+        </ul>
+
+        <h4 class="subtitulo">Ejemplo aplicado: Calificaciones de estudiantes</h4>
+        <p class="texto">El departamento académico registra las calificaciones del trimestre de 6 estudiantes y usa =PROMEDIO() para calcular el promedio de cada uno y el promedio general del grupo.</p>
+        <div class="hoja-wrap">
+          <div class="hoja-label">📊 Hoja de cálculo – Calificaciones trimestrales</div>
+          <table class="hoja">
+            <thead>
+              <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="col-label">1</td><td class="header-row">Estudiante</td><td class="header-row">Parcial 1</td><td class="header-row">Parcial 2</td><td class="header-row">Final</td><td class="header-row">Promedio</td></tr>
+              <tr><td class="col-label">2</td><td class="dato">Ana</td><td class="dato">85</td><td class="dato">90</td><td class="dato">88</td><td class="formula-cell">=PROMEDIO(B2:D2)</td></tr>
+              <tr><td class="col-label">3</td><td class="dato">Luis</td><td class="dato">72</td><td class="dato">68</td><td class="dato">75</td><td class="formula-cell">=PROMEDIO(B3:D3)</td></tr>
+              <tr><td class="col-label">4</td><td class="dato">María</td><td class="dato">95</td><td class="dato">98</td><td class="dato">94</td><td class="formula-cell">=PROMEDIO(B4:D4)</td></tr>
+              <tr><td class="col-label">5</td><td class="dato">Carlos</td><td class="dato">60</td><td class="dato">65</td><td class="dato">70</td><td class="formula-cell">=PROMEDIO(B5:D5)</td></tr>
+              <tr><td class="col-label">6</td><td class="header-row" colspan="4" style="text-align:right;font-size:0.78rem;padding-right:10px;">PROMEDIO GENERAL DEL GRUPO</td><td class="formula-cell">=PROMEDIO(E2:E5)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <table class="tabla-ejemplo">
+          <thead>
+            <tr><th>Celda</th><th>Fórmula</th><th class="th-resultado">Resultado</th><th>Interpretación</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="celda-ref">E2</td><td class="celda-formula">=PROMEDIO(B2:D2)</td><td class="celda-resultado">87.67</td><td>Promedio de Ana</td></tr>
+            <tr><td class="celda-ref">E3</td><td class="celda-formula">=PROMEDIO(B3:D3)</td><td class="celda-resultado">71.67</td><td>Promedio de Luis</td></tr>
+            <tr><td class="celda-ref">E4</td><td class="celda-formula">=PROMEDIO(B4:D4)</td><td class="celda-resultado">95.67</td><td>Promedio de María</td></tr>
+            <tr><td class="celda-ref">E5</td><td class="celda-formula">=PROMEDIO(B5:D5)</td><td class="celda-resultado">65.00</td><td>Promedio de Carlos</td></tr>
+            <tr><td class="celda-ref">E6</td><td class="celda-formula">=PROMEDIO(E2:E5)</td><td class="celda-resultado">80.00</td><td>Promedio general del grupo</td></tr>
+          </tbody>
+        </table>
+        <div class="tip-box">
+          ✅ <strong>Uso en reportes:</strong> PROMEDIO es clave en reportes de rendimiento, análisis de ventas, evaluaciones académicas y cualquier comparación de desempeño a lo largo del tiempo.
+        </div>
+      </div>
+    </div>
+
+    <!-- MÓDULO 3: CONTAR -->
+    <div class="modulo">
+      <div class="modulo-header">
+        <div class="modulo-num">3</div>
+        <h3>Función CONTAR</h3>
+        <span class="func-badge">=CONTAR()</span>
+      </div>
+      <div class="modulo-body">
+        <div class="def-box">
+          La función <strong>CONTAR</strong> cuenta la cantidad de celdas que contienen <em>valores numéricos</em> dentro de un rango. Es útil para saber cuántos registros hay en una base de datos, cuántos productos tienen precio asignado o cuántos empleados tienen salario registrado.
+        </div>
+        <h4 class="subtitulo">Sintaxis</h4>
+        <div class="sintaxis-box">
+          <div class="sintaxis-label">Estructura de la fórmula</div>
+          <div class="sintaxis-code">=<span class="kw">CONTAR</span>(<span class="arg">rango</span>)</div>
+        </div>
+        <ul class="lista-teoria">
+          <li><strong>Solo cuenta números:</strong> las celdas con texto, vacías o con errores <em>no se cuentan</em>.</li>
+          <li>Para contar celdas no vacías (cualquier tipo de dato) se usa <strong>=CONTARA()</strong>.</li>
+          <li>Para contar con una condición se usa <strong>=CONTAR.SI()</strong>.</li>
+        </ul>
+
+        <h4 class="subtitulo">Ejemplo aplicado: Control de asistencia y pagos</h4>
+        <p class="texto">El departamento de RR.HH. lleva un registro de pagos de empleados. Algunas celdas están vacías porque el empleado no tiene pago registrado ese mes. Se usa =CONTAR() para saber cuántos empleados recibieron pago.</p>
+        <div class="hoja-wrap">
+          <div class="hoja-label">📊 Hoja de cálculo – Registro de pagos</div>
+          <table class="hoja">
+            <thead>
+              <tr><th></th><th>A</th><th>B</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="col-label">1</td><td class="header-row">Empleado</td><td class="header-row">Pago (RD$)</td></tr>
+              <tr><td class="col-label">2</td><td class="dato">Pedro Gómez</td><td class="dato">25,000</td></tr>
+              <tr><td class="col-label">3</td><td class="dato">Rosa Díaz</td><td class="dato">30,000</td></tr>
+              <tr><td class="col-label">4</td><td class="dato">Juan Méndez</td><td style="background:#fffde7;color:#aaa;font-style:italic;font-size:0.8rem;">sin registro</td></tr>
+              <tr><td class="col-label">5</td><td class="dato">Laura Peña</td><td class="dato">28,500</td></tr>
+              <tr><td class="col-label">6</td><td class="dato">Marcos Ruiz</td><td style="background:#fffde7;color:#aaa;font-style:italic;font-size:0.8rem;">sin registro</td></tr>
+              <tr><td class="col-label">7</td><td class="dato">Carmen Ríos</td><td class="dato">22,000</td></tr>
+              <tr><td class="col-label">8</td><td class="header-row" style="text-align:right;font-size:0.78rem;padding-right:10px;">EMPLEADOS CON PAGO</td><td class="formula-cell">=CONTAR(B2:B7)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <table class="tabla-ejemplo">
+          <thead>
+            <tr><th>Celda</th><th>Fórmula</th><th class="th-resultado">Resultado</th><th>Interpretación</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="celda-ref">B8</td><td class="celda-formula">=CONTAR(B2:B7)</td><td class="celda-resultado">4</td><td>Solo 4 empleados tienen pago numérico registrado</td></tr>
+          </tbody>
+        </table>
+        <div class="info-box">
+          💡 <strong>CONTAR vs CONTARA:</strong> =CONTAR() cuenta solo números. =CONTARA() cuenta cualquier celda no vacía (texto, números, fechas). En el ejemplo anterior, =CONTARA(B2:B7) daría 6, porque también contaría las celdas con "sin registro".
+        </div>
+      </div>
+    </div>
+
+    <!-- MÓDULO 4: MIN -->
+    <div class="modulo">
+      <div class="modulo-header">
+        <div class="modulo-num">4</div>
+        <h3>Función MIN</h3>
+        <span class="func-badge">=MIN()</span>
+      </div>
+      <div class="modulo-body">
+        <div class="def-box">
+          La función <strong>MIN</strong> devuelve el valor <em>más pequeño</em> (mínimo) dentro de un rango de celdas. Es muy útil en reportes para identificar el precio más bajo, la calificación más baja, el mes de menor venta o el empleado con menor producción.
+        </div>
+        <h4 class="subtitulo">Sintaxis</h4>
+        <div class="sintaxis-box">
+          <div class="sintaxis-label">Estructura de la fórmula</div>
+          <div class="sintaxis-code">=<span class="kw">MIN</span>(<span class="arg">rango</span>)</div>
+        </div>
+        <ul class="lista-teoria">
+          <li>Recorre todos los valores del rango y devuelve el <strong>menor</strong>.</li>
+          <li>Ignora las celdas vacías y las que contienen texto.</li>
+          <li>Para obtener el segundo mínimo se usa la función <strong>=K.ESIMO.MENOR()</strong>.</li>
+        </ul>
+
+        <h4 class="subtitulo">Ejemplo aplicado: Análisis de precios de productos</h4>
+        <p class="texto">Un negocio de tecnología tiene registrados los precios de sus productos. El gerente necesita saber cuál es el precio más bajo para diseñar una estrategia de descuentos.</p>
+        <div class="hoja-wrap">
+          <div class="hoja-label">📊 Hoja de cálculo – Catálogo de precios</div>
+          <table class="hoja">
+            <thead>
+              <tr><th></th><th>A</th><th>B</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="col-label">1</td><td class="header-row">Producto</td><td class="header-row">Precio (RD$)</td></tr>
+              <tr><td class="col-label">2</td><td class="dato">Laptop HP</td><td class="dato">45,000</td></tr>
+              <tr><td class="col-label">3</td><td class="dato">Mouse inalámbrico</td><td class="dato">1,200</td></tr>
+              <tr><td class="col-label">4</td><td class="dato">Monitor LG 24"</td><td class="dato">18,500</td></tr>
+              <tr><td class="col-label">5</td><td class="dato">Teclado mecánico</td><td class="dato">3,800</td></tr>
+              <tr><td class="col-label">6</td><td class="dato">Tablet Samsung</td><td class="dato">22,000</td></tr>
+              <tr><td class="col-label">7</td><td class="dato">Cable HDMI</td><td class="dato">450</td></tr>
+              <tr><td class="col-label">8</td><td class="header-row" style="text-align:right;font-size:0.78rem;padding-right:10px;">PRECIO MÁS BAJO</td><td class="formula-cell">=MIN(B2:B7)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <table class="tabla-ejemplo">
+          <thead>
+            <tr><th>Celda</th><th>Fórmula</th><th class="th-resultado">Resultado</th><th>Interpretación</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="celda-ref">B8</td><td class="celda-formula">=MIN(B2:B7)</td><td class="celda-resultado">450</td><td>El Cable HDMI es el producto más económico</td></tr>
+          </tbody>
+        </table>
+        <div class="tip-box">
+          ✅ <strong>Uso en reportes:</strong> MIN es esencial en reportes de inventario y precios, análisis de rendimiento mínimo, control de calidad y cualquier situación donde se necesite identificar el valor más bajo de un conjunto de datos.
+        </div>
+      </div>
+    </div>
+
+    <!-- MÓDULO 5: MAX -->
+    <div class="modulo">
+      <div class="modulo-header">
+        <div class="modulo-num">5</div>
+        <h3>Función MAX</h3>
+        <span class="func-badge">=MAX()</span>
+      </div>
+      <div class="modulo-body">
+        <div class="def-box">
+          La función <strong>MAX</strong> devuelve el valor <em>más grande</em> (máximo) dentro de un rango de celdas. Es complementaria a MIN y juntas permiten conocer el rango de variación de los datos en un reporte: el valor más alto y el más bajo.
+        </div>
+        <h4 class="subtitulo">Sintaxis</h4>
+        <div class="sintaxis-box">
+          <div class="sintaxis-label">Estructura de la fórmula</div>
+          <div class="sintaxis-code">=<span class="kw">MAX</span>(<span class="arg">rango</span>)</div>
+        </div>
+        <ul class="lista-teoria">
+          <li>Recorre todos los valores del rango y devuelve el <strong>mayor</strong>.</li>
+          <li>Ignora las celdas vacías y las que contienen texto.</li>
+          <li>Para obtener el segundo máximo se usa la función <strong>=K.ESIMO.MAYOR()</strong>.</li>
+        </ul>
+
+        <h4 class="subtitulo">Ejemplo aplicado: Reporte de ventas por vendedor</h4>
+        <p class="texto">Una empresa comercial quiere reconocer al vendedor con mejor desempeño del mes. Se usa =MAX() para identificar la venta más alta y =MIN() para comparar con la más baja.</p>
+        <div class="hoja-wrap">
+          <div class="hoja-label">📊 Hoja de cálculo – Ventas por vendedor</div>
+          <table class="hoja">
+            <thead>
+              <tr><th></th><th>A</th><th>B</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="col-label">1</td><td class="header-row">Vendedor</td><td class="header-row">Ventas (RD$)</td></tr>
+              <tr><td class="col-label">2</td><td class="dato">Sandra Mora</td><td class="dato">185,000</td></tr>
+              <tr><td class="col-label">3</td><td class="dato">Roberto Cruz</td><td class="dato">142,500</td></tr>
+              <tr><td class="col-label">4</td><td class="dato">Natalia Vega</td><td class="dato">230,000</td></tr>
+              <tr><td class="col-label">5</td><td class="dato">Felipe Torres</td><td class="dato">98,000</td></tr>
+              <tr><td class="col-label">6</td><td class="dato">Verónica Gil</td><td class="dato">175,300</td></tr>
+              <tr><td class="col-label">7</td><td class="header-row" style="text-align:right;font-size:0.78rem;padding-right:10px;">VENTA MÁS ALTA</td><td class="formula-cell">=MAX(B2:B6)</td></tr>
+              <tr><td class="col-label">8</td><td class="header-row" style="text-align:right;font-size:0.78rem;padding-right:10px;">VENTA MÁS BAJA</td><td class="formula-cell">=MIN(B2:B6)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <table class="tabla-ejemplo">
+          <thead>
+            <tr><th>Celda</th><th>Fórmula</th><th class="th-resultado">Resultado</th><th>Interpretación</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="celda-ref">B7</td><td class="celda-formula">=MAX(B2:B6)</td><td class="celda-resultado">230,000</td><td>Natalia Vega tuvo la venta más alta</td></tr>
+            <tr><td class="celda-ref">B8</td><td class="celda-formula">=MIN(B2:B6)</td><td class="celda-resultado">98,000</td><td>Felipe Torres tuvo la venta más baja</td></tr>
+          </tbody>
+        </table>
+        <div class="tip-box">
+          ✅ <strong>Uso en reportes:</strong> MAX se usa en reportes de ventas para identificar al mejor vendedor, en reportes de temperatura para el día más caluroso, en finanzas para el gasto más elevado, o en logística para el pedido de mayor volumen.
+        </div>
+      </div>
+    </div>
+
+    <!-- MÓDULO 6: Uso combinado -->
+    <div class="modulo">
+      <div class="modulo-header">
+        <div class="modulo-num">6</div>
+        <h3>Uso combinado de las 5 funciones en un reporte</h3>
+      </div>
+      <div class="modulo-body">
+        <div class="def-box">
+          En la práctica, los reportes empresariales utilizan las cinco funciones juntas para ofrecer un <strong>análisis completo</strong> de los datos. Una tabla de resumen con SUMA, PROMEDIO, CONTAR, MIN y MAX brinda una visión integral del comportamiento de los datos.
+        </div>
+        <h4 class="subtitulo">Ejemplo: Reporte mensual de producción</h4>
+        <p class="texto">La planta de producción de <em>IndusPulse</em> registra las unidades producidas por cada operario durante el mes. El reporte final incluye todas las funciones:</p>
+        <div class="hoja-wrap">
+          <div class="hoja-label">📊 Hoja de cálculo – Reporte de producción mensual</div>
+          <table class="hoja" style="min-width:500px;">
+            <thead>
+              <tr><th></th><th>A</th><th>B</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="col-label">1</td><td class="header-row">Operario</td><td class="header-row">Unidades producidas</td></tr>
+              <tr><td class="col-label">2</td><td class="dato">Operario 1</td><td class="dato">320</td></tr>
+              <tr><td class="col-label">3</td><td class="dato">Operario 2</td><td class="dato">415</td></tr>
+              <tr><td class="col-label">4</td><td class="dato">Operario 3</td><td class="dato">290</td></tr>
+              <tr><td class="col-label">5</td><td class="dato">Operario 4</td><td class="dato">380</td></tr>
+              <tr><td class="col-label">6</td><td class="dato">Operario 5</td><td class="dato">510</td></tr>
+              <tr><td class="col-label">8</td><td class="header-row" style="text-align:right;padding-right:10px;font-size:0.78rem;">TOTAL PRODUCIDO</td><td class="formula-cell">=SUMA(B2:B6)</td></tr>
+              <tr><td class="col-label">9</td><td class="header-row" style="text-align:right;padding-right:10px;font-size:0.78rem;">PROMEDIO POR OPERARIO</td><td class="formula-cell">=PROMEDIO(B2:B6)</td></tr>
+              <tr><td class="col-label">10</td><td class="header-row" style="text-align:right;padding-right:10px;font-size:0.78rem;">CANTIDAD DE OPERARIOS</td><td class="formula-cell">=CONTAR(B2:B6)</td></tr>
+              <tr><td class="col-label">11</td><td class="header-row" style="text-align:right;padding-right:10px;font-size:0.78rem;">MENOR PRODUCCIÓN</td><td class="formula-cell">=MIN(B2:B6)</td></tr>
+              <tr><td class="col-label">12</td><td class="header-row" style="text-align:right;padding-right:10px;font-size:0.78rem;">MAYOR PRODUCCIÓN</td><td class="formula-cell">=MAX(B2:B6)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <table class="tabla-ejemplo">
+          <thead>
+            <tr><th>Función</th><th>Fórmula</th><th class="th-resultado">Resultado</th><th>Lo que dice el reporte</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="celda-ref">SUMA</td><td class="celda-formula">=SUMA(B2:B6)</td><td class="celda-resultado">1,915</td><td>Total de unidades producidas en el mes</td></tr>
+            <tr><td class="celda-ref">PROMEDIO</td><td class="celda-formula">=PROMEDIO(B2:B6)</td><td class="celda-resultado">383</td><td>Producción media por operario</td></tr>
+            <tr><td class="celda-ref">CONTAR</td><td class="celda-formula">=CONTAR(B2:B6)</td><td class="celda-resultado">5</td><td>Hay 5 operarios con registro numérico</td></tr>
+            <tr><td class="celda-ref">MIN</td><td class="celda-formula">=MIN(B2:B6)</td><td class="celda-resultado">290</td><td>El Operario 3 tuvo la menor producción</td></tr>
+            <tr><td class="celda-ref">MAX</td><td class="celda-formula">=MAX(B2:B6)</td><td class="celda-resultado">510</td><td>El Operario 5 tuvo la mayor producción</td></tr>
+          </tbody>
+        </table>
+        <div class="info-box">
+          💡 <strong>Clave para el examen:</strong> Cuando el enunciado diga "total" → usa SUMA; "promedio" o "media" → PROMEDIO; "cuántos" o "cantidad" → CONTAR; "más bajo / menor" → MIN; "más alto / mayor" → MAX.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /teoria-wrap -->
+
+  <!-- BOTÓN INICIAR PRUEBA -->
+  <div class="btn-iniciar-wrap">
+    <button class="btn-iniciar" onclick="iniciarPrueba()">
+      <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg>
+      Iniciar Prueba
+    </button>
+  </div>
+
+  <div class="footer-nota">PNSA · Análisis y Diseño de Reportes · Ing. Juana Alt. Paulino</div>
+
+</div><!-- /main-wrap -->
+
+<!-- ════════ OVERLAY DE PRUEBA ════════ -->
+<div id="prueba-overlay">
+  <div class="overlay-header">
+    <div class="overlay-header-left">
+      Fórmulas de Cálculo · <strong id="ov-num-label">Datos</strong>
+    </div>
+    <div class="overlay-progreso">
+      <div class="prog-barra"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <span class="prog-texto" id="prog-texto">0 / 15</span>
+    </div>
+  </div>
+
+  <div class="overlay-body">
+
+    <!-- Pantalla 0: datos -->
+    <div class="screen activa" id="screen-datos">
+      <div class="prueba-header">
+        <div class="section-eyebrow">📝 Evaluación</div>
+        <h2>Prueba de Opción Múltiple</h2>
+        <p>15 ítems · Retroalimentación inmediata · Valor total: 3 puntos</p>
+      </div>
+      <div class="datos-form">
+        <div class="form-group">
+          <label>Nombre completo del estudiante</label>
+          <input type="text" id="inp-nombre" placeholder="Escribe tu nombre y apellido">
+        </div>
+        <div class="form-group">
+          <label>Fecha</label>
+          <input type="date" id="inp-fecha">
+        </div>
+      </div>
+      <button class="btn-iniciar" style="width:100%;justify-content:center;border-radius:10px;padding:15px;" onclick="empezarPreguntas()">
+        Comenzar &rarr;
+      </button>
+    </div>
+
+    <!-- Pantalla por pregunta -->
+    <div id="pantalla-pregunta" class="screen"></div>
+
+    <!-- Resultados -->
+    <div class="screen" id="screen-resultados">
+      <div class="resultados">
+        <div class="res-nombre" id="res-nombre-label"></div>
+        <div class="res-score" id="res-score">0<span>/3.00</span></div>
+        <div class="res-label">puntos obtenidos</div>
+        <div class="res-barra-wrap"><div class="res-barra-fill" id="res-barra"></div></div>
+        <div class="res-stats">
+          <div class="res-stat"><div class="res-stat-num" id="res-correctas">0</div><div class="res-stat-label">Correctas</div></div>
+          <div class="res-stat"><div class="res-stat-num" id="res-incorrectas">0</div><div class="res-stat-label">Incorrectas</div></div>
+          <div class="res-stat"><div class="res-stat-num">15</div><div class="res-stat-label">Total ítems</div></div>
+        </div>
+        <button class="btn-pdf" onclick="generarPDF()">
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h4a2 2 0 012 2v3"/><path d="M3 17a2 2 0 002 2h14a2 2 0 002-2"/></svg>
+          Descargar Prueba en PDF
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const TOTAL_PUNTOS = 3;
+const preguntas = [
+  {
+    texto: "¿Con qué carácter debe iniciar siempre una fórmula en Excel?",
+    opciones: [
+      "Con el signo # (numeral), que indica que es una operación matemática.",
+      "Con el signo @ (arroba), que identifica funciones de cálculo.",
+      "Con el signo = (igual), que le indica a Excel que se trata de una fórmula."
+    ],
+    correcta: 2,
+    feedback_ok: "¡Correcto! Toda fórmula en Excel debe comenzar con el signo = (igual). Sin ese signo, Excel interpreta el contenido como texto y no realiza ningún cálculo.",
+    feedback_mal: "Incorrecto. En Excel, toda fórmula debe comenzar obligatoriamente con el signo = (igual). Ese símbolo le indica al programa que debe ejecutar un cálculo, no mostrar texto."
+  },
+  {
+    texto: "¿Qué hace la función =SUMA(B2:B10) en una hoja de cálculo?",
+    opciones: [
+      "Suma todos los valores numéricos contenidos en las celdas B2 hasta B10.",
+      "Calcula el promedio de los valores en las celdas B2 hasta B10.",
+      "Cuenta la cantidad de celdas que hay entre B2 y B10."
+    ],
+    correcta: 0,
+    feedback_ok: "¡Muy bien! =SUMA(B2:B10) suma todos los valores numéricos del rango B2 hasta B10 y muestra el total en la celda donde se escribe la fórmula.",
+    feedback_mal: "Incorrecto. =SUMA() suma todos los valores del rango indicado. Para calcular el promedio se usa =PROMEDIO() y para contar celdas se usa =CONTAR()."
+  },
+  {
+    texto: "Una empresa tiene ventas de RD$50,000; RD$70,000 y RD$30,000 en las celdas C2, C3 y C4. ¿Qué resultado dará =SUMA(C2:C4)?",
+    opciones: [
+      "RD$70,000, porque suma solo el valor más alto.",
+      "RD$50,000, porque devuelve el valor del medio del rango.",
+      "RD$150,000, porque suma los tres valores del rango."
+    ],
+    correcta: 2,
+    feedback_ok: "¡Exacto! 50,000 + 70,000 + 30,000 = 150,000. La función SUMA adiciona todos los valores del rango indicado y presenta el total.",
+    feedback_mal: "Incorrecto. =SUMA(C2:C4) suma los tres valores: 50,000 + 70,000 + 30,000 = 150,000. La función no selecciona un valor, los suma todos."
+  },
+  {
+    texto: "¿Qué calcula la función =PROMEDIO()?",
+    opciones: [
+      "El valor que aparece con más frecuencia en el rango de datos.",
+      "La media aritmética: suma todos los valores y los divide entre la cantidad de valores.",
+      "El valor que está en el punto medio del rango cuando están ordenados."
+    ],
+    correcta: 1,
+    feedback_ok: "¡Correcto! =PROMEDIO() calcula la media aritmética: suma todos los valores del rango y divide entre la cantidad de valores numéricos. Por ejemplo, el promedio de 80, 90 y 70 es (80+90+70)/3 = 80.",
+    feedback_mal: "Incorrecto. =PROMEDIO() calcula la media aritmética, que consiste en sumar todos los valores y dividirlos entre la cantidad de valores. El valor más frecuente sería la moda y el valor central sería la mediana."
+  },
+  {
+    texto: "Si las calificaciones de un estudiante son 85, 90 y 95, ¿qué resultado daría =PROMEDIO(A1:A3)?",
+    opciones: [
+      "270, porque suma las tres calificaciones.",
+      "95, porque devuelve el valor mayor del rango.",
+      "90, porque es la media aritmética de los tres valores."
+    ],
+    correcta: 2,
+    feedback_ok: "¡Perfecto! (85 + 90 + 95) / 3 = 270 / 3 = 90. La función PROMEDIO suma los valores y divide entre la cantidad de datos, dando como resultado 90.",
+    feedback_mal: "Incorrecto. =PROMEDIO() no suma ni busca el máximo; calcula la media: (85+90+95) ÷ 3 = 90. Ese es el promedio de las tres calificaciones."
+  },
+  {
+    texto: "¿Qué tipo de celdas cuenta la función =CONTAR()?",
+    opciones: [
+      "Solo las celdas que contienen valores numéricos.",
+      "Todas las celdas del rango, incluyendo las vacías.",
+      "Solo las celdas que contienen texto o palabras."
+    ],
+    correcta: 0,
+    feedback_ok: "¡Correcto! =CONTAR() únicamente cuenta las celdas que tienen valores numéricos. Las celdas con texto, vacías o con errores no son contadas por esta función.",
+    feedback_mal: "Incorrecto. =CONTAR() cuenta exclusivamente celdas con valores numéricos. Para contar todas las celdas no vacías (incluyendo texto) se usa =CONTARA(), y las celdas vacías se cuentan con =CONTAR.BLANCO()."
+  },
+  {
+    texto: "En un rango de 8 celdas, 3 están vacías y 2 tienen texto. ¿Qué resultado dará =CONTAR() sobre ese rango?",
+    opciones: [
+      "8, porque cuenta todas las celdas del rango.",
+      "3, porque solo cuenta las que tienen números (8 – 3 vacías – 2 con texto).",
+      "5, porque cuenta las no vacías (3 vacías + 5 con dato)."
+    ],
+    correcta: 1,
+    feedback_ok: "¡Exacto! Si hay 8 celdas, 3 vacías y 2 con texto, quedan 3 con valores numéricos. =CONTAR() solo cuenta esas 3 celdas numéricas.",
+    feedback_mal: "Incorrecto. =CONTAR() ignora las celdas vacías y las que tienen texto. De 8 celdas totales, restando 3 vacías y 2 con texto, quedan 3 con números. El resultado es 3."
+  },
+  {
+    texto: "¿Qué devuelve la función =MIN()?",
+    opciones: [
+      "El valor más pequeño dentro del rango de celdas indicado.",
+      "El valor más grande dentro del rango de celdas indicado.",
+      "La cantidad de valores que hay en el rango indicado."
+    ],
+    correcta: 0,
+    feedback_ok: "¡Correcto! =MIN() recorre todos los valores del rango y devuelve el menor de todos. Es útil para identificar el precio más bajo, la nota más baja o el mes de menor venta.",
+    feedback_mal: "Incorrecto. =MIN() devuelve el valor MÍNIMO, es decir, el más pequeño del rango. El valor más grande lo da =MAX() y la cantidad de valores la da =CONTAR()."
+  },
+  {
+    texto: "Un reporte tiene los siguientes valores en D2:D6 → 45, 12, 78, 33, 60. ¿Qué resultado da =MIN(D2:D6)?",
+    opciones: [
+      "78, porque es el valor más alto del rango.",
+      "45.6, porque calcula el promedio del rango.",
+      "12, porque es el valor más bajo del rango."
+    ],
+    correcta: 2,
+    feedback_ok: "¡Muy bien! Entre los valores 45, 12, 78, 33 y 60, el número más pequeño es 12. Eso es exactamente lo que devuelve =MIN().",
+    feedback_mal: "Incorrecto. =MIN() devuelve el valor más pequeño del rango. Analizando los valores 45, 12, 78, 33 y 60, el más pequeño es claramente 12."
+  },
+  {
+    texto: "¿Para qué se utiliza la función =MAX() en un reporte?",
+    opciones: [
+      "Para identificar el valor más alto o mayor dentro de un rango de datos.",
+      "Para sumar todos los valores de un rango y obtener el total.",
+      "Para contar cuántos valores hay registrados en una columna."
+    ],
+    correcta: 0,
+    feedback_ok: "¡Correcto! =MAX() encuentra y devuelve el valor más grande del rango. En reportes se usa para identificar el mejor vendedor, el mes de mayor ingreso, el producto más caro, etc.",
+    feedback_mal: "Incorrecto. =MAX() no suma ni cuenta; devuelve el valor máximo (más alto) del rango. Para sumar se usa =SUMA() y para contar se usa =CONTAR()."
+  },
+  {
+    texto: "Con los valores 200, 450, 300, 150, 500 en el rango E2:E6, ¿qué resultado da =MAX(E2:E6)?",
+    opciones: [
+      "150, porque es el valor más pequeño.",
+      "500, porque es el valor más grande del rango.",
+      "320, porque es el promedio de los cinco valores."
+    ],
+    correcta: 1,
+    feedback_ok: "¡Exacto! Entre 200, 450, 300, 150 y 500, el número más grande es 500. La función =MAX() siempre devuelve el mayor valor del rango.",
+    feedback_mal: "Incorrecto. =MAX() devuelve el mayor valor. Analizando 200, 450, 300, 150 y 500, el número más alto es 500. Ese es el resultado de =MAX(E2:E6)."
+  },
+  {
+    texto: "¿Cuál función se debe usar para saber cuántos empleados tienen su salario registrado en una columna que también tiene celdas vacías?",
+    opciones: [
+      "=SUMA(), porque suma todos los salarios registrados.",
+      "=CONTAR(), porque cuenta solo las celdas que contienen valores numéricos.",
+      "=PROMEDIO(), porque calcula el salario medio del personal."
+    ],
+    correcta: 1,
+    feedback_ok: "¡Correcto! =CONTAR() es perfecta para esta situación: cuenta únicamente las celdas con números (salarios registrados) e ignora las celdas vacías, dando el total de empleados con dato.",
+    feedback_mal: "Incorrecto. Para saber cuántos empleados tienen salario registrado se necesita una función que cuente, no que sume ni calcule promedios. =CONTAR() cuenta solo las celdas numéricas, ignorando las vacías."
+  },
+  {
+    texto: "En un reporte de producción se quiere mostrar: total producido, promedio por turno, turno de mayor producción y turno de menor producción. ¿Qué combinación de funciones se necesita?",
+    opciones: [
+      "=CONTAR(), =SUMA(), =CONTAR() y =SUMA()",
+      "=SUMA(), =PROMEDIO(), =MAX() y =MIN()",
+      "=PROMEDIO(), =PROMEDIO(), =PROMEDIO() y =PROMEDIO()"
+    ],
+    correcta: 1,
+    feedback_ok: "¡Perfecto! SUMA para el total, PROMEDIO para la media por turno, MAX para el turno de mayor producción y MIN para el de menor. Esa combinación cubre los cuatro requerimientos del reporte.",
+    feedback_mal: "Incorrecto. Cada necesidad del reporte requiere una función diferente: total → SUMA, promedio → PROMEDIO, mayor valor → MAX, menor valor → MIN. Esa es la combinación correcta."
+  },
+  {
+    texto: "¿Qué representa la notación B2:B10 dentro de una fórmula como =SUMA(B2:B10)?",
+    opciones: [
+      "Un rango continuo que incluye todas las celdas desde B2 hasta B10.",
+      "Solo las celdas B2 y B10, ignorando las del medio.",
+      "La multiplicación de los valores de B2 y B10."
+    ],
+    correcta: 0,
+    feedback_ok: "¡Correcto! La notación B2:B10 define un rango continuo: incluye B2, B3, B4, B5, B6, B7, B8, B9 y B10, es decir, todas las celdas entre las dos indicadas.",
+    feedback_mal: "Incorrecto. En Excel, los dos puntos (:) entre dos referencias de celda definen un rango continuo. B2:B10 incluye todas las celdas desde B2 hasta B10, no solo las dos extremas ni una multiplicación."
+  },
+  {
+    texto: "¿Cuál de las siguientes afirmaciones sobre las funciones de cálculo es CORRECTA?",
+    opciones: [
+      "=SUMA() y =PROMEDIO() siempre dan el mismo resultado si el rango tiene los mismos datos.",
+      "=CONTAR() suma los valores numéricos del rango, igual que =SUMA().",
+      "=MIN() y =MAX() sirven para conocer el rango de variación de los datos: el valor más bajo y el más alto."
+    ],
+    correcta: 2,
+    feedback_ok: "¡Excelente! MIN y MAX son funciones complementarias: juntas permiten conocer el valor mínimo y el máximo de un conjunto de datos, lo que define el rango de variación o amplitud en el reporte.",
+    feedback_mal: "Incorrecto. La afirmación correcta es que MIN y MAX son complementarias: identifican el valor más bajo y el más alto. SUMA y PROMEDIO dan resultados diferentes, y CONTAR solo cuenta, no suma."
+  }
+];
+
+const respuestas = new Array(preguntas.length).fill(null);
+let preguntaActual = 0;
+
+function iniciarPrueba() {
+  const overlay = document.getElementById('prueba-overlay');
+  overlay.classList.add('activo');
+  document.body.style.overflow = 'hidden';
+  overlay.scrollTop = 0;
+  const hoy = new Date().toISOString().split('T')[0];
+  document.getElementById('inp-fecha').value = hoy;
+}
+
+function empezarPreguntas() {
+  const nombre = document.getElementById('inp-nombre').value.trim();
+  if (!nombre) {
+    document.getElementById('inp-nombre').focus();
+    document.getElementById('inp-nombre').style.borderColor = 'var(--rojo)';
+    return;
+  }
+  mostrarScreen('screen-datos', false);
+  mostrarScreen('pantalla-pregunta', true);
+  preguntaActual = 0;
+  renderPreguntaActual();
+}
+
+function mostrarScreen(id, visible) {
+  const el = document.getElementById(id);
+  if (visible) {
+    el.classList.add('activa');
+    document.getElementById('prueba-overlay').scrollTop = 0;
+  } else {
+    el.classList.remove('activa');
+  }
+}
+
+function renderPreguntaActual() {
+  const idx = preguntaActual;
+  const p = preguntas[idx];
+  const panel = document.getElementById('pantalla-pregunta');
+  const pct = (idx / 15) * 100;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-texto').textContent = `${idx} / 15`;
+  document.getElementById('ov-num-label').textContent = `Pregunta ${idx + 1} de 15`;
+
+  panel.innerHTML = `
+    <div class="pregunta-single" id="pregunta-single-card">
+      <div class="pregunta-num">Ítem ${String(idx+1).padStart(2,'0')} de 15</div>
+      <div class="pregunta-texto">${p.texto}</div>
+      <div class="opciones">
+        ${p.opciones.map((op, oi) => `
+          <label class="opcion-label" id="op-${idx}-${oi}">
+            <input type="radio" name="preg${idx}" value="${oi}" onchange="responderActual(${idx},${oi})">
+            <span class="radio-custom"></span>
+            ${op}
+          </label>
+        `).join('')}
+      </div>
+      <div class="feedback" id="fb-${idx}"></div>
+    </div>
+    <button class="btn-siguiente" id="btn-sig" onclick="avanzarPregunta()">
+      ${idx < 14 ? 'Siguiente pregunta →' : 'Ver resultados →'}
+    </button>
+  `;
+  panel.classList.add('activa');
+}
+
+function responderActual(idx, opcion) {
+  if (respuestas[idx] !== null) return;
+  respuestas[idx] = opcion;
+  const p = preguntas[idx];
+  const correcta = p.correcta;
+  const card = document.getElementById('pregunta-single-card');
+  const fb = document.getElementById(`fb-${idx}`);
+
+  p.opciones.forEach((_, oi) => {
+    const label = document.getElementById(`op-${idx}-${oi}`);
+    label.classList.add('disabled');
+    if (oi === correcta) label.classList.add('correcta-op');
+    if (oi === opcion && oi !== correcta) label.classList.add('incorrecta-op');
+  });
+
+  if (opcion === correcta) {
+    fb.className = 'feedback correcto';
+    fb.innerHTML = `<span class="feedback-icon">✅</span> ${p.feedback_ok}`;
+    card.classList.add('correcta');
+  } else {
+    fb.className = 'feedback incorrecto';
+    fb.innerHTML = `<span class="feedback-icon">❌</span> ${p.feedback_mal}`;
+    card.classList.add('incorrecta');
+  }
+
+  document.getElementById('btn-sig').classList.add('visible');
+  document.getElementById('prueba-overlay').scrollTop = 0;
+}
+
+function avanzarPregunta() {
+  if (preguntaActual < 14) {
+    preguntaActual++;
+    renderPreguntaActual();
+  } else {
+    mostrarResultados();
+  }
+}
+
+function mostrarResultados() {
+  const nombre = document.getElementById('inp-nombre').value.trim() || 'Estudiante';
+  const correctas = respuestas.filter((r, i) => r === preguntas[i].correcta).length;
+  const incorrectas = 15 - correctas;
+  const puntaje = ((correctas / 15) * TOTAL_PUNTOS).toFixed(2);
+
+  document.getElementById('res-nombre-label').textContent = nombre;
+  document.getElementById('res-score').innerHTML = `${puntaje}<span>/${TOTAL_PUNTOS.toFixed(2)}</span>`;
+  document.getElementById('res-correctas').textContent = correctas;
+  document.getElementById('res-incorrectas').textContent = incorrectas;
+  document.getElementById('prog-fill').style.width = '100%';
+  document.getElementById('prog-texto').textContent = '15 / 15';
+  document.getElementById('ov-num-label').textContent = 'Resultados';
+
+  mostrarScreen('pantalla-pregunta', false);
+  mostrarScreen('screen-resultados', true);
+
+  setTimeout(() => {
+    document.getElementById('res-barra').style.width = ((correctas / 15) * 100) + '%';
+  }, 200);
+}
+
+function generarPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const nombre = document.getElementById('inp-nombre').value.trim() || 'Estudiante';
+  const fecha = document.getElementById('inp-fecha').value || new Date().toISOString().split('T')[0];
+  const fechaFormateada = fecha.split('-').reverse().join('/');
+  const correctas = respuestas.filter((r, i) => r === preguntas[i].correcta).length;
+  const puntaje = ((correctas / 15) * TOTAL_PUNTOS).toFixed(2);
+  const W = 210, M = 20;
+  let y = 0;
+
+  // Header
+  doc.setFillColor(13, 13, 13);
+  doc.rect(0, 0, W, 40, 'F');
+  doc.setFillColor(192, 0, 26);
+  doc.rect(0, 40, W, 3, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(16);
+  doc.text('PRUEBA: FÓRMULAS DE CÁLCULO EN REPORTES', W / 2, 17, { align: 'center' });
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(170, 170, 170);
+  doc.text('Análisis y Diseño de Reportes · 3.° Secundaria', W / 2, 27, { align: 'center' });
+  doc.text('PNSA · Ing. Juana Alt. Paulino', W / 2, 34, { align: 'center' });
+
+  y = 52;
+
+  // Datos estudiante
+  doc.setFillColor(245, 245, 245);
+  doc.roundedRect(M, y, W - M * 2, 22, 3, 3, 'F');
+  doc.setTextColor(13, 13, 13);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text('ESTUDIANTE:', M + 5, y + 8);
+  doc.setFont('helvetica', 'normal');
+  doc.text(nombre, M + 35, y + 8);
+  doc.setFont('helvetica', 'bold');
+  doc.text('FECHA:', M + 5, y + 16);
+  doc.setFont('helvetica', 'normal');
+  doc.text(fechaFormateada, M + 35, y + 16);
+  y += 30;
+
+  // Preguntas
+  preguntas.forEach((p, idx) => {
+    const esCorrecta = respuestas[idx] === p.correcta;
+    const respIdx = respuestas[idx];
+    const textoRespuesta = respIdx !== null ? p.opciones[respIdx] : 'Sin respuesta';
+    const textoCorrecta = p.opciones[p.correcta];
+
+    const lineasPregunta = doc.splitTextToSize(`${idx + 1}. ${p.texto}`, W - M * 2 - 20);
+    const lineasRespuesta = doc.splitTextToSize(textoRespuesta, W - M * 2 - 20);
+    const alturaBloque = 6 + lineasPregunta.length * 5 + lineasRespuesta.length * 4.5 + (esCorrecta ? 0 : 14) + 10;
+
+    if (y + alturaBloque > 275) { doc.addPage(); y = 20; }
+
+    const cardColor = esCorrecta ? [237, 247, 242] : [255, 240, 242];
+    doc.setFillColor(...cardColor);
+    doc.roundedRect(M, y, W - M * 2, alturaBloque, 2, 2, 'F');
+    const barColor = esCorrecta ? [0, 107, 60] : [192, 0, 26];
+    doc.setFillColor(...barColor);
+    doc.rect(M, y, 3, alturaBloque, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...barColor);
+    doc.text(esCorrecta ? '✓' : '✗', M + 7, y + 7);
+    doc.setTextColor(13, 13, 13);
+    doc.setFontSize(8.5);
+    doc.setFont('helvetica', 'bold');
+    lineasPregunta.forEach((l, li) => doc.text(l, M + 14, y + 7 + li * 5));
+    let yInner = y + 7 + lineasPregunta.length * 5 + 2;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    const labelResp = esCorrecta ? 'Respuesta correcta: ' : 'Tu respuesta: ';
+    doc.setTextColor(...barColor);
+    doc.text(labelResp, M + 14, yInner);
+    doc.setTextColor(50, 50, 50);
+    const anchoLabel = doc.getTextWidth(labelResp);
+    const linesResp = doc.splitTextToSize(textoRespuesta, W - M * 2 - 14 - anchoLabel - 2);
+    linesResp.forEach((l, li) => doc.text(l, M + 14 + anchoLabel, yInner + li * 4.5));
+    yInner += linesResp.length * 4.5 + 2;
+    if (!esCorrecta) {
+      doc.setTextColor(0, 107, 60);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Respuesta correcta: ', M + 14, yInner);
+      const anchoCorr = doc.getTextWidth('Respuesta correcta: ');
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(50, 50, 50);
+      const linesCorr = doc.splitTextToSize(textoCorrecta, W - M * 2 - 14 - anchoCorr - 2);
+      linesCorr.forEach((l, li) => doc.text(l, M + 14 + anchoCorr, yInner + li * 4.5));
+    }
+    y += alturaBloque + 4;
+  });
+
+  // Resultados finales
+  if (y + 45 > 275) { doc.addPage(); y = 20; }
+  doc.setFillColor(13, 13, 13);
+  doc.roundedRect(M, y, W - M * 2, 42, 4, 4, 'F');
+  doc.setFillColor(192, 0, 26);
+  doc.roundedRect(M, y, W - M * 2, 8, 4, 4, 'F');
+  doc.rect(M, y + 4, W - M * 2, 4, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(8);
+  doc.text('RESULTADOS FINALES', W / 2, y + 6, { align: 'center' });
+  const correctas2 = respuestas.filter((r, i) => r === preguntas[i].correcta).length;
+  const incorrectas2 = 15 - correctas2;
+  const pctFinal = Math.round((correctas2 / 15) * 100);
+  doc.setFontSize(22);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${puntaje} / ${TOTAL_PUNTOS.toFixed(2)} pts`, W / 2, y + 24, { align: 'center' });
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(170, 170, 170);
+  doc.text(`Correctas: ${correctas2}   Incorrectas: ${incorrectas2}   Porcentaje: ${pctFinal}%`, W / 2, y + 34, { align: 'center' });
+  doc.text(`Estudiante: ${nombre}   Fecha: ${fechaFormateada}`, W / 2, y + 40, { align: 'center' });
+
+  doc.save(`Prueba_Formulas_Calculos_${nombre.replace(/\s+/g,'_')}.pdf`);
+}
+</script>
+</body>
+</html>
